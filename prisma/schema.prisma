@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String         @id @default(cuid())
+  name              String
+  email             String         @unique
+  password          String
+  role              Role
+  skills            Skill[]
+  sessionsAsTeacher Session[]      @relation("TeacherSessions")
+  sessionsAsLearner Session[]      @relation("LearnerSessions")
+  reviews           Review[]
+  availability      Availability[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+enum Role {
+  TEACHER
+  LEARNER
+}
+
+model Skill {
+  id        String        @id @default(cuid())
+  name      String
+  category  SkillCategory
+  teacher   User          @relation(fields: [teacherId], references: [id])
+  teacherId String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  Session Session[]
+}
+
+enum SkillCategory {
+  TECHNICAL
+  CREATIVE
+  ACADEMIC
+  BUSINESS
+  OTHER
+}
+
+model Session {
+  id        String        @id @default(cuid())
+  skill     Skill         @relation(fields: [skillId], references: [id])
+  skillId   String
+  teacher   User          @relation("TeacherSessions", fields: [teacherId], references: [id])
+  teacherId String
+  learner   User          @relation("LearnerSessions", fields: [learnerId], references: [id])
+  learnerId String
+  date      DateTime
+  status    SessionStatus @default(PENDING)
+  review    Review?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@unique([teacherId, date])
+}
+
+enum SessionStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELED
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  session   Session  @relation(fields: [sessionId], references: [id])
+  sessionId String   @unique
+  learner   User     @relation(fields: [learnerId], references: [id])
+  learnerId String
+  rating    Int      @default(0)
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Availability {
+  id        String   @id @default(cuid())
+  teacher   User     @relation(fields: [teacherId], references: [id])
+  teacherId String
+  day       Weekday
+  startTime String // "09:00"
+  endTime   String // "17:00"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Weekday {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
