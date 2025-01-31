@@ -10,18 +10,13 @@ router.get("/", auth(Role.ADMIN), userController.getAllFromDB);
 
 router.get(
     "/me",
-    auth(Role.ADMIN, Role.VENDOR, Role.USER),
+    auth(Role.ADMIN, Role.TEACHER, Role.LEARNER),
     userController.getMyProfile
-);
-router.get(
-    "/favorite-shop",
-    auth(Role.ADMIN, Role.VENDOR, Role.USER),
-    userController.getAllFavoriteShop
 );
 
 router.put(
     "/me",
-    auth(Role.ADMIN, Role.VENDOR, Role.USER),
+    auth(Role.ADMIN, Role.TEACHER, Role.LEARNER),
     upload.fields([{ name: "avatar", maxCount: 1 }]),
     (req: Request, res: Response, next: NextFunction) => {
         if (req.body.data) {
@@ -43,18 +38,6 @@ router.patch(
         next();
     },
     userController.update
-);
-
-router.post(
-    "/followShop/:shopId",
-    auth(Role.ADMIN, Role.VENDOR, Role.USER),
-    userController.followShop
-);
-
-router.post(
-    "/unfollowShop/:shopId",
-    auth(Role.ADMIN, Role.VENDOR, Role.USER),
-    userController.unfollowShop
 );
 
 router.delete("/:id", auth(Role.ADMIN), userController.DeleteUser);

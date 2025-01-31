@@ -23,23 +23,6 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-const getAllFavoriteShop = catchAsync(async (req: Request  & { user?: IAuthUser }, res: Response) => {
-    // console.log(req.query)
-    const user = req.user;
-    const filters = pick(req.query, ["name", "status"]);
-    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
-
-    const result = await userService.getAllFavoriteShops(user?.user as unknown as string, filters, options);
-
-    sendResponse(res, {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Users Favorite Shop data fetched!",
-        meta: result.meta,
-        data: result.data,
-    });
-});
-
 const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
     const result = await userService.changeProfileStatus(id, req.body);
@@ -52,10 +35,10 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-const getMyProfile = catchAsync(
-    async (req: Request & { user?: IAuthUser }, res: Response) => {
+const getMyProfile = catchAsync(async (req: Request & { user?: IAuthUser }, res: Response) => {
         const user = req.user;
-
+        console.log(user);
+        
         const result = await userService.getMyProfile(user as IAuthUser);
 
         sendResponse(res, {
@@ -86,42 +69,6 @@ const updateMyProfie = catchAsync(
     }
 );
 
-const followShop = catchAsync(
-    async (req: Request & { user?: IAuthUser }, res: Response) => {
-        const { shopId } = req.params;
-        const user = req.user;
-
-        const result = await userService.followShop({
-            userId: user?.user as unknown as string,
-            shopId,
-        });
-        sendResponse(res, {
-            statusCode: StatusCodes.OK,
-            success: true,
-            message: "Successfully Followed!",
-            data: result,
-        });
-    }
-);
-
-const unfollowShop = catchAsync(
-    async (req: Request & { user?: IAuthUser }, res: Response) => {
-        const { shopId } = req.params;
-        const user = req.user;
-
-        const result = await userService.unfollowShop({
-            userId: user?.user as unknown as string,
-            shopId,
-        });
-        sendResponse(res, {
-            statusCode: StatusCodes.OK,
-            success: true,
-            message: "Successfully Unfollowed!",
-            data: result,
-        });
-    }
-);
-
 const update = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
 
@@ -146,15 +93,11 @@ const DeleteUser = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-
 export const userController = {
     getAllFromDB,
-    getAllFavoriteShop,
     changeProfileStatus,
     getMyProfile,
     updateMyProfie,
     update,
-    followShop,
-    unfollowShop,
-    DeleteUser
+    DeleteUser,
 };

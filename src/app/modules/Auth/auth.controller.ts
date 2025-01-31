@@ -18,24 +18,12 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
         statusCode: StatusCodes.OK,
         success: true,
         message: "Logged in successfully!",
-        data: result.accessToken
+        data: result
     })
 });
 
 const signupUser = catchAsync(async (req: Request, res: Response) => {
     const result = await AuthServices.signupUser(req.body);
-
-    sendResponse(res, {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: "Sign Up successfully!",
-        data: result
-    })
-});
-
-const vendorSignup = catchAsync(async (req: Request, res: Response) => {
-
-    const result = await AuthServices.vendorSignup(req.files, req.body);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,
@@ -106,7 +94,6 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 export const AuthController = {
     loginUser,
     signupUser,
-    vendorSignup,
     refreshToken,
     changePassword,
     forgotPassword,

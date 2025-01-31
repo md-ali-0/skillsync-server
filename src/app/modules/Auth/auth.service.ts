@@ -1,4 +1,4 @@
-import { Role, ShopStatus, UserStatus } from "@prisma/client";
+import { Role, UserStatus } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { StatusCodes } from "http-status-codes";
 import { Secret } from "jsonwebtoken";
@@ -37,17 +37,8 @@ const loginUser = async (payload: { email: string; password: string }) => {
             "User not found or inactive!"
         );
     }
-    if (user.status === UserStatus.SUSPEND) {
-        throw new ApiError(
-            StatusCodes.UNAUTHORIZED,
-            "User Suspended"
-        );
-    }
-    if (user.isDeleted) {
-        throw new ApiError(
-            StatusCodes.UNAUTHORIZED,
-            "User Deleted"
-        );
+    if (user.status === UserStatus.BLOCKED) {
+        throw new ApiError(StatusCodes.UNAUTHORIZED, "User Suspended");
     }
     const isCorrectPassword = await bcrypt.compare(password, user.password);
 
@@ -78,50 +69,11 @@ const signupUser = async (payload: {
             name,
             email,
             password: hashedPassword,
-            role: "USER",
+            role,
         },
     });
 
     return newUser;
-};
-
-const vendorSignup = async (files: any, payload: any) => {
-    const { name, email, password, shopName, shopDescription } = payload;
-    
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    
-    const logoUrl = files?.shopLogo?.[0]?.path || "";
-
-    const result = await prisma.$transaction(async (tx) => {
-
-        const newUser = await tx.user.create({
-            data: {
-                name,
-                email,
-                password: hashedPassword,
-                role: Role.VENDOR,
-            },
-        });
-        const newVendor = await tx.vendor.create({
-            data: {
-                userId: newUser.id,
-            },
-        });
-        
-        const newShop = await tx.shop.create({
-            data: {
-                name: shopName,
-                description: shopDescription,
-                logoUrl,
-                vendorId: newVendor.id,
-                status: ShopStatus.ACTIVE
-            },
-        });
-
-        return { newUser, newVendor, newShop };
-    });
-
-    return result;
 };
 
 const refreshToken = async (token: string) => {
@@ -215,7 +167,6 @@ const forgotPassword = async (payload: { email: string }) => {
     );
 };
 
-
 const resetPassword = async (token: string, payload: { password: string }) => {
     let decodedToken;
     try {
@@ -223,7 +174,6 @@ const resetPassword = async (token: string, payload: { password: string }) => {
             token,
             config.jwt.reset_pass_secret as Secret
         );
-
     } catch (err) {
         throw new ApiError(
             StatusCodes.UNAUTHORIZED,
@@ -244,7 +194,6 @@ const resetPassword = async (token: string, payload: { password: string }) => {
 export const AuthServices = {
     loginUser,
     signupUser,
-    vendorSignup,
     refreshToken,
     changePassword,
     forgotPassword,
