@@ -71,8 +71,8 @@ To get this project up and running on your local machine, follow these steps:
 - Password: 123456
 
 ## Live URLs
--   **Frontend Deployment**: [Frontend Live URL](https://#.app)
--   **Backend Deployment**: [Backend Live URL](https://#.app)
+-   **Frontend Deployment**: [Frontend Live URL](https://skill-sync-nine.vercel.app)
+-   **Backend Deployment**: [Backend Live URL](https://skilsync-api.vercel.app/)
 
 ## Contact
 For queries or support, reach out via [Mohammad Ali](mailto:mohammad..98482@gmail.com). or the project repository.

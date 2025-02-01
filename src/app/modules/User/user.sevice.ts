@@ -217,6 +217,8 @@ const update = async (
     if (avatar) {
         data.avatar = avatar;
     }
+    console.log(avatar);
+    
     if (data.password) {
         data.password = bcrypt.hashSync(data.password, 10);
     }
