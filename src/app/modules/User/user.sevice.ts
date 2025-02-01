@@ -77,6 +77,67 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     };
 };
 
+const getAllTeachersFromDB = async (params: any, options: IPaginationOptions) => {
+    const { page, limit, skip } = paginationHelper.calculatePagination(options);
+    const { searchTerm, ...filterData } = params;
+
+    const andConditions: Prisma.UserWhereInput[] = [
+        { role: "TEACHER" },
+    ];
+
+    if (searchTerm) {
+        andConditions.push({
+            OR: userSearchAbleFields.map((field) => ({
+                [field]: {
+                    contains: searchTerm,
+                    mode: "insensitive",
+                },
+            })),
+        });
+    }
+
+    if (Object.keys(filterData).length > 0) {
+        andConditions.push({
+            AND: Object.keys(filterData).map((key) => ({
+                [key]: {
+                    equals: filterData[key],
+                },
+            })),
+        });
+    }
+
+    const whereConditions: Prisma.UserWhereInput = andConditions.length > 0 ? { AND: andConditions } : {};
+
+    const result = await prisma.user.findMany({
+        where: whereConditions,
+        skip,
+        take: limit,
+        orderBy: options.sortBy && options.sortOrder
+            ? { [options.sortBy]: options.sortOrder }
+            : { createdAt: "desc" },
+        include: {
+            skills: true
+        }
+    });
+    
+    const total = await prisma.user.count({
+        where: whereConditions,
+    });
+
+    const totalPage = Math.ceil(total / limit);
+
+    return {
+        meta: {
+            page,
+            limit,
+            total,
+            totalPage,
+        },
+        data: result,
+    };
+};
+
+
 const changeProfileStatus = async (id: string, status: Role) => {
     const userData = await prisma.user.findUniqueOrThrow({
         where: {
@@ -95,8 +156,7 @@ const changeProfileStatus = async (id: string, status: Role) => {
 };
 
 const getMyProfile = async (user: IAuthUser) => {
-    console.log(user);
-    
+
     const userInfo = await prisma.user.findUniqueOrThrow({
         where: {
             id: user?.user,
@@ -187,6 +247,7 @@ const DeleteUser = async (id: string): Promise<User | null> => {
 
 export const userService = {
     getAllFromDB,
+    getAllTeachersFromDB,
     changeProfileStatus,
     getMyProfile,
     updateMyProfie,

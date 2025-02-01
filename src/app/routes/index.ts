@@ -1,5 +1,8 @@
 import express from 'express';
 import { AuthRoutes } from '../modules/Auth/auth.routes';
+import { AvailabilityRoutes } from '../modules/Availability/availability.route';
+import { SessionRoutes } from '../modules/Sessions/session.route';
+import { SkillRoutes } from '../modules/Skills/skill.route';
 import { userRoutes } from '../modules/User/user.routes';
 
 const router = express.Router();
@@ -12,6 +15,18 @@ const moduleRoutes = [
     {
         path: '/auth',
         route: AuthRoutes
+    },
+    {
+        path: '/skills',
+        route: SkillRoutes
+    },
+    {
+        path: '/sessions',
+        route: SessionRoutes
+    },
+    {
+        path: '/availability',
+        route: AvailabilityRoutes
     },
 ];
 

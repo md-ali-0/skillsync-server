@@ -73,7 +73,7 @@ model Session {
   review    Review?
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
-
+  
   @@unique([teacherId, date])
 }
 
@@ -103,6 +103,7 @@ model Availability {
   day       Weekday
   startTime String // "09:00"
   endTime   String // "17:00"
+  date      DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

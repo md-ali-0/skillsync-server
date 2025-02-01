@@ -8,11 +8,27 @@ import { userFilterableFields } from "./user.constant";
 import { userService } from "./user.sevice";
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
-    // console.log(req.query)
+
     const filters = pick(req.query, userFilterableFields);
     const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
 
     const result = await userService.getAllFromDB(filters, options);
+
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: "Users data fetched!",
+        meta: result.meta,
+        data: result.data,
+    });
+});
+
+const getAllTeachersFromDB = catchAsync(async (req: Request, res: Response) => {
+
+    const filters = pick(req.query, userFilterableFields);
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+
+    const result = await userService.getAllTeachersFromDB(filters, options);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,
@@ -95,6 +111,7 @@ const DeleteUser = catchAsync(async (req: Request, res: Response) => {
 
 export const userController = {
     getAllFromDB,
+    getAllTeachersFromDB,
     changeProfileStatus,
     getMyProfile,
     updateMyProfie,
