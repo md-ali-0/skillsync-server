@@ -24,6 +24,22 @@ To get this project up and running on your local machine, follow these steps:
 - npm (>= 8) or yarn (>= 1.22)
 - PostgreSQL
 
+## Key Features
+### User Roles
+- Learners: Book sessions, leave reviews
+- Teachers: Manage skills, set availability
+- Admin: Manage users, view analytics
+
+### Skill Management
+- Add/remove teachable skills
+- Categorize skills (Technical, Creative, Academic)
+- Search and filter skills
+
+### Session Booking
+- Real-time availability checking
+- Calendar integration
+- Session status tracking (Scheduled/Completed/Cancelled)
+
 ### Frontend Setup:
 
 1. Navigate to the frontend directory:
