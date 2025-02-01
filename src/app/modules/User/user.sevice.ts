@@ -116,7 +116,8 @@ const getAllTeachersFromDB = async (params: any, options: IPaginationOptions) =>
             ? { [options.sortBy]: options.sortOrder }
             : { createdAt: "desc" },
         include: {
-            skills: true
+            skills: true,
+            availability: true,
         }
     });
     

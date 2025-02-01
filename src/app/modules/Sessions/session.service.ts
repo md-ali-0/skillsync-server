@@ -1,11 +1,14 @@
 import { Prisma, Session } from "@prisma/client";
 import { paginationHelper } from "../../../helpars/paginationHelper";
 import prisma from "../../../shared/prisma";
+import { IAuthUser } from "../../interfaces/common";
 import { IPaginationOptions } from "../../interfaces/pagination";
 
-const create = async (payload: Session) => {
+const create = async (user: IAuthUser, payload: Session) => {
+    console.log(payload);
+    
     const result = await prisma.session.create({
-        data: payload,
+        data: {...payload, learnerId: user.user},
     });
 
     return result;

@@ -7,8 +7,8 @@ const router = Router();
 
 router.get("/", SessionController.getAll);
 router.get("/:id", SessionController.getOne);
-router.post("/", auth(Role.TEACHER), SessionController.create);
-router.patch("/:id", auth(Role.TEACHER), SessionController.update);
+router.post("/", auth(Role.LEARNER, Role.TEACHER), SessionController.create);
+router.patch("/:id", auth(Role.TEACHER, Role.LEARNER), SessionController.update);
 router.delete("/:id", SessionController.remove);
 
 export const SessionRoutes = router;
