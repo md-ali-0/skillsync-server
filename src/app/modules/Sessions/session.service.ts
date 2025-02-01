@@ -1,20 +1,60 @@
 import { Prisma, Session } from "@prisma/client";
+import { StatusCodes } from "http-status-codes";
 import { paginationHelper } from "../../../helpars/paginationHelper";
 import prisma from "../../../shared/prisma";
+import ApiError from "../../errors/ApiError";
 import { IAuthUser } from "../../interfaces/common";
 import { IPaginationOptions } from "../../interfaces/pagination";
 
 const create = async (user: IAuthUser, payload: Session) => {
-    console.log(payload);
-    
+    const date = new Date(payload.date);
+
+    const existingSession = await prisma.session.findFirst({
+        where: {
+            teacherId: payload.teacherId,
+            date: date,
+        },
+    });
+
+    if (existingSession) {
+        throw new ApiError(
+            StatusCodes.BAD_REQUEST,
+            "A session already exists for this teacher on this date."
+        );
+    }
+
+    const skillExists = await prisma.skill.findUnique({
+        where: { id: payload.skillId },
+    });
+
+    if (!skillExists) {
+        throw new ApiError(
+            StatusCodes.BAD_REQUEST,
+            "Invalid skillId. Skill does not exist."
+        );
+    }
+
+    if (!payload.teacherId || !payload.skillId || !date) {
+        throw new ApiError(
+            StatusCodes.BAD_REQUEST,
+            "Missing required fields for session creation."
+        );
+    }
+
+    const sessionData = {
+        ...payload,
+        learnerId: user.user,
+        date: date,
+    };
     const result = await prisma.session.create({
-        data: {...payload, learnerId: user.user},
+        data: sessionData,
     });
 
     return result;
 };
 
 const getAll = async (
+    user: IAuthUser,
     params: Record<string, unknown>,
     options: IPaginationOptions
 ) => {
@@ -22,7 +62,12 @@ const getAll = async (
     const { searchTerm, ...filterData } = params;
 
     const andCondions: Prisma.SessionWhereInput[] = [];
-
+    if (user.role === "LEARNER") {
+        andCondions.push({ learnerId: user.user})
+    }
+    if (user.role === "TEACHER") {
+        andCondions.push({ teacherId: user.user})
+    }
     if (params.searchTerm) {
         andCondions.push({
             OR: ["name"].map((field) => ({
@@ -59,6 +104,12 @@ const getAll = async (
                 : {
                       createdAt: "desc",
                   },
+        include: {
+            skill: true,
+            learner: true,
+            teacher: true,
+            review: true,
+        },
     });
 
     const total = await prisma.session.count({

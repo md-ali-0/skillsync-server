@@ -1,14 +1,14 @@
 import { Role } from "@prisma/client";
 import { Router } from "express";
 import auth from "../../middlewares/auth";
-import { SkillController } from "./skill.controller";
+import { ReviewController } from "./review.controller";
 
 const router = Router();
 
-router.get("/", auth(Role.TEACHER, Role.LEARNER, Role.ADMIN), SkillController.getAll);
-router.get("/:id", SkillController.getOne);
-router.post("/", auth(Role.TEACHER), SkillController.create);
-router.patch("/:id", auth(Role.TEACHER), SkillController.update);
-router.delete("/:id", SkillController.remove);
+router.get("/", auth(Role.TEACHER, Role.LEARNER, Role.ADMIN), ReviewController.getAll);
+router.get("/:id", ReviewController.getOne);
+router.post("/", auth(Role.LEARNER), ReviewController.create);
+router.patch("/:id", auth(Role.LEARNER), ReviewController.update);
+router.delete("/:id", ReviewController.remove);
 
-export const SkillRoutes = router;
+export const ReviewRoutes = router;

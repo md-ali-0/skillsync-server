@@ -5,22 +5,22 @@ import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../../shared/catchAsync";
 import { IAuthUser } from "../../interfaces/common";
-import { SkillService } from "./skill.service";
+import { ReviewService } from "./review.service";
 
 const create = catchAsync(async (req: Request & { user?: IAuthUser }, res: Response) => {
     const user = req.user
-    const result = await SkillService.create(user as IAuthUser, req.body);
+    const result = await ReviewService.create(user as IAuthUser, req.body);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
-        message: "Skill data created!",
+        message: "Review data created!",
         data: result,
     });
 });
 
 const getAll: RequestHandler = catchAsync(
     async (req: Request & { user?: IAuthUser }, res: Response) => {
-        const filters = pick(req.query,  ['name', "category", 'teacherId', 'searchTerm']);
+        const filters = pick(req.query,  ['name', 'learnerId', 'searchTerm']);
         const options = pick(req.query, [
             "limit",
             "page",
@@ -31,12 +31,12 @@ const getAll: RequestHandler = catchAsync(
         console.log('user', user);
     
         
-        const result = await SkillService.getAll(user as IAuthUser, filters, options);
+        const result = await ReviewService.getAll(user as IAuthUser, filters, options);
 
         sendResponse(res, {
             statusCode: StatusCodes.OK,
             success: true,
-            message: "Skill data fetched!",
+            message: "Review data fetched!",
             meta: result.meta,
             data: result.data,
         });
@@ -46,11 +46,11 @@ const getAll: RequestHandler = catchAsync(
 const getOne = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const result = await SkillService.getOne(id);
+    const result = await ReviewService.getOne(id);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
-        message: "Skill data Created",
+        message: "Review data Created",
         data: result,
     });
 });
@@ -58,11 +58,11 @@ const getOne = catchAsync(async (req: Request, res: Response) => {
 const update = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const result = await SkillService.update(id, req.body);
+    const result = await ReviewService.update(id, req.body);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
-        message: "Skill data updated!",
+        message: "Review data updated!",
         data: result,
     });
 });
@@ -70,16 +70,16 @@ const update = catchAsync(async (req: Request, res: Response) => {
 const remove = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
 
-    const result = await SkillService.remove(id);
+    const result = await ReviewService.remove(id);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,
-        message: "Skill data deleted!",
+        message: "Review data deleted!",
         data: result,
     });
 });
 
-export const SkillController = {
+export const ReviewController = {
     create,
     getAll,
     getOne,

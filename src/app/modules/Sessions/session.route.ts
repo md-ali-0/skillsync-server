@@ -5,7 +5,7 @@ import { SessionController } from "./session.controller";
 
 const router = Router();
 
-router.get("/", SessionController.getAll);
+router.get("/", auth(Role.LEARNER, Role.TEACHER, Role.ADMIN), SessionController.getAll);
 router.get("/:id", SessionController.getOne);
 router.post("/", auth(Role.LEARNER, Role.TEACHER), SessionController.create);
 router.patch("/:id", auth(Role.TEACHER, Role.LEARNER), SessionController.update);

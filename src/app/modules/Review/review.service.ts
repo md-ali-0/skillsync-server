@@ -1,4 +1,4 @@
-import { Prisma, Review, Role, Skill } from "@prisma/client";
+import { Prisma, Review } from "@prisma/client";
 import { paginationHelper } from "../../../helpars/paginationHelper";
 import prisma from "../../../shared/prisma";
 import { IAuthUser } from "../../interfaces/common";
@@ -21,11 +21,11 @@ const getAll = async (
     const { page, limit, skip } = paginationHelper.calculatePagination(options);
     const { searchTerm, ...filterData } = params;
 
-    const andCondions: Prisma.SkillWhereInput[] = [];
+    const andCondions: Prisma.ReviewWhereInput[] = [];
 
-    if (user?.role === Role.TEACHER) {
+    if (user?.role === "LEARNER") {
         andCondions.push({
-            teacherId: user?.user,
+            learnerId: user?.user,
         });
     }
 
@@ -51,9 +51,9 @@ const getAll = async (
     }
 
     //console.dir(andCondions, { depth: 'inifinity' })
-    const whereConditons: Prisma.SkillWhereInput = { AND: andCondions };
+    const whereConditons: Prisma.ReviewWhereInput = { AND: andCondions };
 
-    const result = await prisma.skill.findMany({
+    const result = await prisma.review.findMany({
         where: whereConditons,
         skip,
         take: limit,
@@ -67,7 +67,7 @@ const getAll = async (
                   },
     });
 
-    const total = await prisma.skill.count({
+    const total = await prisma.review.count({
         where: whereConditons,
     });
 
@@ -84,8 +84,8 @@ const getAll = async (
     };
 };
 
-const getOne = async (id: string): Promise<Skill | null> => {
-    const result = await prisma.skill.findUnique({
+const getOne = async (id: string): Promise<Review | null> => {
+    const result = await prisma.review.findUnique({
         where: {
             id,
         },
@@ -94,14 +94,14 @@ const getOne = async (id: string): Promise<Skill | null> => {
     return result;
 };
 
-const update = async (id: string, data: Partial<Skill>): Promise<Skill> => {
-    await prisma.skill.findUniqueOrThrow({
+const update = async (id: string, data: Partial<Review>): Promise<Review> => {
+    await prisma.review.findUniqueOrThrow({
         where: {
             id,
         },
     });
 
-    const result = await prisma.skill.update({
+    const result = await prisma.review.update({
         where: {
             id,
         },
@@ -111,14 +111,14 @@ const update = async (id: string, data: Partial<Skill>): Promise<Skill> => {
     return result;
 };
 
-const remove = async (id: string): Promise<Skill | null> => {
-    await prisma.skill.findUniqueOrThrow({
+const remove = async (id: string): Promise<Review | null> => {
+    await prisma.review.findUniqueOrThrow({
         where: {
             id,
         },
     });
 
-    const result = await prisma.skill.delete({
+    const result = await prisma.review.delete({
         where: {
             id,
         },
@@ -127,7 +127,7 @@ const remove = async (id: string): Promise<Skill | null> => {
     return result;
 };
 
-export const SkillService = {
+export const ReviewService = {
     create,
     getAll,
     getOne,

@@ -19,7 +19,7 @@ const create = catchAsync(async (req: Request & { user?: IAuthUser }, res: Respo
 });
 
 const getAll: RequestHandler = catchAsync(
-    async (req: Request, res: Response) => {
+    async (req: Request & { user?: IAuthUser }, res: Response) => {
         const filters = pick(req.query,  ['name', 'searchTerm']);
         const options = pick(req.query, [
             "limit",
@@ -27,7 +27,8 @@ const getAll: RequestHandler = catchAsync(
             "sortBy",
             "sortOrder",
         ]);
-        const result = await SessionService.getAll(filters, options);
+        const user = req.user
+        const result = await SessionService.getAll(user as IAuthUser, filters, options);
 
         sendResponse(res, {
             statusCode: StatusCodes.OK,
